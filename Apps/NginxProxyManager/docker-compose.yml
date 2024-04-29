@@ -1,6 +1,4 @@
 name: nginxproxymanager
-networks:
-  nginx:
 services:
   nginxproxymanager:
     image: jc21/nginx-proxy-manager:latest
@@ -8,8 +6,7 @@ services:
       resources:
         reservations:
           memory: "128M"
-    network: 
-      - nginx
+    network_mode: bridge
     ports:
       - target: 80
         published: "80"
