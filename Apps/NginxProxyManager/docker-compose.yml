@@ -1,7 +1,7 @@
 name: nginxproxymanager
 services:
   nginxproxymanager:
-    image: jc21/nginx-proxy-manager:latest
+    image: jc21/nginx-proxy-manager:2.11.1
     deploy:
       resources:
         reservations:
@@ -58,8 +58,8 @@ x-casaos:
     - arm64
     - arm
   main: nginxproxymanager
-  author: Rahneverd
-  category: RdStore
+  author: CasaOS Team
+  category: Network
   description:
     en_us: Nginx Proxy Manager is a simple, powerful tool to help you host multiple websites on a single server.
     zh_cn: Nginx 代理管理器是一个简单、强大的工具，可帮助您在单个服务器上托管多个网站。
