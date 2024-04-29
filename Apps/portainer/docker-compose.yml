@@ -12,7 +12,7 @@ services:
   # Main Portainer service configuration
   app:
     container_name: rd-portainer # Name of the running container
-    image: portainer/portainer-ce:2.20.1-alpine # Image to be used
+    image: portainer/portainer # Image to be used
     networks: # Network binding
       - nginx 
     ports: # Port mapping between host and container

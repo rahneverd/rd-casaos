@@ -1,0 +1,65 @@
+# Configuration for rd-nginx-proxy-manager setup
+name: rd-nginx-proxy-manager
+
+# Networks definitions for the rd-nginx-proxy-manager application
+networks:
+   nginx: # NGINX network to be created
+
+# Service definitions for the rd-nginx-proxy-manager application
+services:
+  # Main Nginx Proxy Manager service configuration
+  app:
+    container_name: rd-nginx-proxy-manager # Name of the running container
+    image: jc21/nginx-proxy-manager:latest # Image to be used
+    networks: # Network binding
+      - nginx 
+    ports: # Port mapping between host and container
+      - 80:80
+      - 81:81
+      - 443:443
+    volumes:
+      - /mnt/ehdc/docker/nginx/volume/data:/data # Bind mount for nginx data
+      - /mnt/ehdc/docker/nginx/volume/letsencrypt:/etc/letsencrypt # Bind mount for letsencrypt
+    x-casaos:
+      ports:
+        - container: "80"
+          description:
+            en_us: "Container: 80" # Description for the port
+        - container: "81"
+          description:
+            en_us: "Container: 81" # Description for the port
+        - container: "443"
+          description:
+            en_us: "Container: 443" # Description for the port
+      volumes:
+        - container: /data
+          description:
+            en_us: Access to Nginx data # Description for Nginx data volume
+        - container: /etc/letsencrypt
+          description:
+            en_us: Access to Letsencrypt data # Description for Letsencrypt volume
+
+# CasaOS specific configuration
+x-casaos:
+  architectures: # Supported CPU architectures
+    - amd64
+    - arm64
+  main: app # Main service of the application
+  description: # Description in different languages
+    en_us: Docker container for managing Nginx proxy hosts with a simple, powerful interface. Perfect for home servers.
+  tagline: # Short description or tagline in different languages
+    en_us: Nginx Proxy manager
+  developer: "Nginx Proxy Manager" # Developer's name or identifier
+  author: Rahneverd # Author of this configuration
+  icon: https://github.com/walkxcode/dashboard-icons/blob/main/png/nginx-proxy-manager.png?raw=true
+  # Thumbnail image (currently empty)
+  thumbnail: ""
+  # Title of the application in English
+  title:
+    en_us: Nginx Proxy Manager
+  # Application category
+  category: RdStore
+  # Port mapping for the application
+  port_map: "81"
+  # URL scheme for the application
+  scheme: https
