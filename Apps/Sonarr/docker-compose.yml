@@ -5,7 +5,7 @@ services:
       PGID: 1000
       PUID: 1000
       TZ: Asia/Karachi
-    image: linuxserver/sonarr:3.0.10
+    image: linuxserver/sonarr:latest
     deploy:
       resources:
         reservations:

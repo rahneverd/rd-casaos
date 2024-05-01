@@ -4,8 +4,8 @@ services:
     environment:
       PHOTOPRISM_ADMIN_PASSWORD: casaos
       PHOTOPRISM_UPLOAD_NSFW: "true"
-      TZ: $TZ
-    image: photoprism/photoprism:231011
+      TZ: Asia/Karachi
+    image: photoprism/photoprism:latest
     deploy:
       resources:
         reservations:
@@ -13,15 +13,15 @@ services:
     network_mode: bridge
     ports:
       - target: 2342
-        published: "2342"
+        published: "8000"
         protocol: tcp
     restart: unless-stopped
     volumes:
       - type: bind
-        source: /DATA/AppData/$AppID/photoprism/storage
+        source: /mnt/ehdc/docker/photoprism/volume/storage
         target: /photoprism/storage
       - type: bind
-        source: /DATA/Gallery
+        source: /mnt/ehdb/photoprism/originals
         target: /photoprism/originals
     x-casaos:
       envs:
@@ -112,4 +112,4 @@ x-casaos:
   title:
     en_us: PhotoPrism
   index: /
-  port_map: "2342"
+  port_map: "8000"

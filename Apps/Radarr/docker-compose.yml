@@ -5,7 +5,7 @@ services:
       PGID: 1000
       PUID: 1000
       TZ: Asia/Karachi
-    image: linuxserver/radarr:5.4.6
+    image: linuxserver/radarr:latest
     deploy:
       resources:
         reservations:
