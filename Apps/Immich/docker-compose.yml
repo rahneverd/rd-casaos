@@ -1,7 +1,7 @@
-# Configuration for big-bear-immich-without-machine-learning setup
-name: Immich
+# Configuration for big-bear-immich setup
+name: big-bear-immich
 
-# Service definitions for the big-bear-immich-without-machine-learning application
+# Service definitions for the big-bear-immich application
 services:
   # Main Immich Server service configuration
   immich-server:
@@ -9,7 +9,7 @@ services:
     image: ghcr.io/immich-app/immich-server:v1.103.1 # Image to be used
     command: ["start.sh", "immich"] # Command to be executed upon container start
     ports: # Mapping ports from the host OS to the container
-      - 8000:3001
+      - 7000:3001
     volumes: # Mounting directories for persistent data storage
       - /mnt/ehdb/immich/upload:/usr/src/app/upload
     environment: # Setting environment variables
@@ -19,10 +19,15 @@ services:
       DB_DATABASE_NAME: immich
       DB_PORT: "5432"
       REDIS_HOSTNAME: immich-redis
+      IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning:3003
     depends_on: # Dependencies to ensure the order of service startup
       - redis
       - database
     restart: unless-stopped # Policy to restart unless stopped
+
+    # Networks to be attached to the container
+    networks:
+      - big_bear_immich_network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -44,6 +49,9 @@ services:
         - container: REDIS_HOSTNAME
           description:
             en_us: "Redis Hostname"
+        - container: IMMICH_MACHINE_LEARNING_URL
+          description:
+            en_us: "Immich Machine Learning URL"
       volumes:
         - container: /usr/src/app/upload
           description:
@@ -68,12 +76,16 @@ services:
       DB_USERNAME: casaos
       DB_PASSWORD: casaos
       DB_DATABASE_NAME: immich
-      DB_PORT: "5432"
+      DB_PORT: 5432
       REDIS_HOSTNAME: immich-redis
     depends_on: # Dependencies to ensure the order of service startup
       - redis
       - database
     restart: unless-stopped # Policy to restart unless stopped
+
+    # Networks to be attached to the container
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -100,11 +112,57 @@ services:
           description:
             en_us: "Container Path: /usr/src/app/upload"
 
+  # Configuration for Immich Machine Learning service
+  immich-machine-learning:
+    container_name: immich-machine-learning # Name of the running container
+    image: ghcr.io/immich-app/immich-machine-learning:v1.103.1 # Image to be used
+    volumes: # Mounting directories for persistent data storage
+      - /home/immichPgData/model-cache:/cache
+    environment: # Setting environment variables
+      DB_HOSTNAME: immich-postgres
+      DB_USERNAME: casaos
+      DB_PASSWORD: casaos
+      DB_DATABASE_NAME: casaos
+      DB_PORT: 5432
+      REDIS_HOSTNAME: immich-redis
+    restart: unless-stopped # Policy to restart unless stopped
+
+    # Networks to be attached to the container
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
+
+    x-casaos: # CasaOS specific configuration
+      envs:
+        - container: DB_HOSTNAME
+          description:
+            en_us: "Database Hostname"
+        - container: DB_USERNAME
+          description:
+            en_us: "Database Username"
+        - container: DB_PASSWORD
+          description:
+            en_us: "Database Password"
+        - container: DB_DATABASE_NAME
+          description:
+            en_us: "Database Name"
+        - container: DB_PORT
+          description:
+            en_us: "Database Port"
+        - container: REDIS_HOSTNAME
+          description:
+            en_us: "Redis Hostname"
+      volumes:
+        - container: /cache
+          description:
+            en_us: "Container Path: /cache"
+
   # Configuration for Redis service
   redis:
     container_name: immich-redis # Name of the running container
     image: redis:6.2-alpine@sha256:70a7a5b641117670beae0d80658430853896b5ef269ccf00d1827427e3263fa3 # Image to be used
     restart: always # Policy to always restart the container if it stops
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
 
   # Configuration for Database service
   database:
@@ -116,8 +174,12 @@ services:
       POSTGRES_DB: immich
       PG_DATA: /var/lib/postgresql/data
     volumes: # Mounting directories for persistent data storage
-      - /mnt/ehdc/docker/immich/volume/pgdata:/var/lib/postgresql/data
-    restart: always # Policy to always restart the container if it stops
+      - /home/immichPgData/pgdata:/var/lib/postgresql/data
+    restart: unless-stopped # Policy to always restart the container if it stops
+
+    # CasaOS specific configuration for the database service
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -138,6 +200,10 @@ services:
           description:
             en_us: "Container Path: /var/lib/postgresql/data"
 
+networks: # Defines network configurations for the services
+  big_bear_immich_network:
+    driver: bridge # Uses bridge network driver
+
 # CasaOS specific configuration
 x-casaos:
   architectures: # Supported CPU architectures
@@ -145,18 +211,18 @@ x-casaos:
     - arm64
   main: immich-server # Main service of the application
   description: # Description in different languages
-    en_us: Self-hosted photo and video storage. This does not include the machine learning part.
+    en_us: Self-hosted photo and video storage.
   tagline: # Short description or tagline in different languages
-    en_us: Immich without machine learning
-  developer: "immich" # Developer's name or identifier
+    en_us: Immich
+  developer: "" # Developer's name or identifier
   author: BigBearTechWorld # Author of this configuration
   icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/png/immich.png
   # Thumbnail image (currently empty)
   thumbnail: ""
   # Title of the application in English
   title:
-    en_us: Immich without machine learning
+    en_us: Immich
   # Application category
-  category: Gallery
+  category: BigBearCasaOS
   # Port mapping information
-  port_map: "8000"
+  port_map: "7000"
